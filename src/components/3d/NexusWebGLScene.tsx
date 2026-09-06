@@ -31,13 +31,19 @@ export const NexusWebGLScene: React.FC<NexusWebGLSceneProps> = () => {
     camera.position.set(0, 0, 7.2);
 
     // 2. High-Fidelity Hardware-Accelerated WebGL Renderer
-    const renderer = new THREE.WebGLRenderer({
-      antialias: !isMobile,
-      alpha: true,
-      powerPreference: 'high-performance',
-      stencil: false,
-      depth: true,
-    });
+    let renderer: THREE.WebGLRenderer;
+    try {
+      renderer = new THREE.WebGLRenderer({
+        antialias: !isMobile,
+        alpha: true,
+        powerPreference: 'high-performance',
+        stencil: false,
+        depth: true,
+      });
+    } catch (e) {
+      console.warn('WebGL initialization skipped:', e);
+      return;
+    }
     renderer.setPixelRatio(maxPixelRatio);
     renderer.setSize(container.clientWidth, container.clientHeight);
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
