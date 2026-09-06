@@ -1,0 +1,213 @@
+{
+  "users": [
+    {
+      "id": "usr_admin_nexus",
+      "name": "Tameem Imran (Founder)",
+      "email": "tameemimran253@gmail.com",
+      "passwordHash": "1f3a55225000be448e1d5b3b6f12e67b7b2a232288355aa9cc4634607ff2bb40ed8f40e93d83913f927161abe5c9ccc2dd98f6896f808a95760289a5bd0754f4",
+      "passwordSalt": "dcda187d499cd5069052afe36d705b6d",
+      "authProvider": "email",
+      "role": "admin",
+      "createdAt": "2026-09-06T11:57:07.314Z",
+      "lastLoginAt": "2026-09-06T16:43:31.893Z"
+    },
+    {
+      "name": "Nexus Explorer",
+      "email": "explorer@nexus.studio",
+      "authProvider": "google",
+      "profilePhotoUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+      "id": "usr_72e1e31c110e999d",
+      "role": "user",
+      "createdAt": "2026-09-06T11:57:16.356Z",
+      "lastLoginAt": "2026-09-06T16:40:35.008Z"
+    },
+    {
+      "name": "Studio Guest",
+      "email": "guest_check@tameemnexus.com",
+      "authProvider": "guest",
+      "id": "usr_8842005bd16cf1db",
+      "role": "user",
+      "createdAt": "2026-09-06T12:04:41.282Z",
+      "lastLoginAt": "2026-09-06T12:04:41.282Z"
+    },
+    {
+      "name": "Nexus Member",
+      "email": "member@facebook.nexus",
+      "authProvider": "facebook",
+      "profilePhotoUrl": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80",
+      "id": "usr_33e34e102dd55603",
+      "role": "user",
+      "createdAt": "2026-09-06T16:40:20.546Z",
+      "lastLoginAt": "2026-09-06T16:40:44.206Z"
+    },
+    {
+      "name": "Tameem Imran",
+      "email": "tameem.imran@facebook.com",
+      "authProvider": "facebook",
+      "profilePhotoUrl": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80",
+      "id": "usr_dd6bd4ec589fcfcb",
+      "role": "user",
+      "createdAt": "2026-09-06T16:43:41.013Z",
+      "lastLoginAt": "2026-09-06T16:43:41.013Z"
+    }
+  ],
+  "authEvents": [
+    {
+      "userId": "usr_dd6bd4ec589fcfcb",
+      "eventType": "SIGNUP",
+      "provider": "FACEBOOK",
+      "email": "tameem.imran@facebook.com",
+      "name": "Tameem Imran",
+      "isNewUser": true,
+      "requestedPage": "/",
+      "userAgent": "curl/7.88.1",
+      "id": "evt_01db47631af63f37",
+      "timestamp": "2026-09-06T16:43:41.014Z"
+    },
+    {
+      "userId": "usr_admin_nexus",
+      "eventType": "LOGIN",
+      "provider": "GOOGLE",
+      "email": "tameemimran253@gmail.com",
+      "name": "Tameem Imran (Founder)",
+      "isNewUser": false,
+      "requestedPage": "/",
+      "userAgent": "curl/7.88.1",
+      "id": "evt_4532a68b6f3531d1",
+      "timestamp": "2026-09-06T16:43:31.893Z"
+    },
+    {
+      "userId": "usr_33e34e102dd55603",
+      "eventType": "LOGOUT",
+      "provider": "facebook",
+      "email": "member@facebook.nexus",
+      "name": "Nexus Member",
+      "isNewUser": false,
+      "requestedPage": "/logout",
+      "id": "evt_ac854dfb412c8e4c",
+      "timestamp": "2026-09-06T16:40:49.004Z"
+    },
+    {
+      "userId": "usr_33e34e102dd55603",
+      "eventType": "LOGIN",
+      "provider": "FACEBOOK",
+      "email": "member@facebook.nexus",
+      "name": "Nexus Member",
+      "isNewUser": false,
+      "requestedPage": "/",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+      "id": "evt_bc5cdb67d3c8fd3c",
+      "timestamp": "2026-09-06T16:40:44.206Z"
+    },
+    {
+      "userId": "usr_72e1e31c110e999d",
+      "eventType": "LOGOUT",
+      "provider": "google",
+      "email": "explorer@nexus.studio",
+      "name": "Nexus Explorer",
+      "isNewUser": false,
+      "requestedPage": "/logout",
+      "id": "evt_c200b1046b5be654",
+      "timestamp": "2026-09-06T16:40:41.313Z"
+    },
+    {
+      "userId": "usr_72e1e31c110e999d",
+      "eventType": "LOGIN",
+      "provider": "GOOGLE",
+      "email": "explorer@nexus.studio",
+      "name": "Nexus Explorer",
+      "isNewUser": false,
+      "requestedPage": "/",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+      "id": "evt_c5c786cd1a46769c",
+      "timestamp": "2026-09-06T16:40:35.008Z"
+    },
+    {
+      "userId": "usr_33e34e102dd55603",
+      "eventType": "SIGNUP",
+      "provider": "FACEBOOK",
+      "email": "member@facebook.nexus",
+      "name": "Nexus Member",
+      "isNewUser": true,
+      "requestedPage": "/",
+      "userAgent": "curl/7.88.1",
+      "id": "evt_e6d89bba61dba39a",
+      "timestamp": "2026-09-06T16:40:20.547Z"
+    },
+    {
+      "userId": "usr_72e1e31c110e999d",
+      "eventType": "LOGIN",
+      "provider": "GOOGLE",
+      "email": "explorer@nexus.studio",
+      "name": "Nexus Explorer",
+      "isNewUser": false,
+      "requestedPage": "/",
+      "userAgent": "curl/7.88.1",
+      "id": "evt_f47c47783cbef537",
+      "timestamp": "2026-09-06T16:40:15.918Z"
+    },
+    {
+      "userId": "usr_72e1e31c110e999d",
+      "eventType": "LOGOUT",
+      "provider": "google",
+      "email": "explorer@nexus.studio",
+      "name": "Nexus Explorer",
+      "isNewUser": false,
+      "requestedPage": "/logout",
+      "id": "evt_5fb72bf38330923e",
+      "timestamp": "2026-09-06T16:39:59.186Z"
+    },
+    {
+      "userId": "usr_8842005bd16cf1db",
+      "eventType": "SIGNUP",
+      "provider": "GUEST",
+      "email": "guest_check@tameemnexus.com",
+      "name": "Studio Guest",
+      "isNewUser": true,
+      "requestedPage": "/",
+      "userAgent": "curl/7.88.1",
+      "id": "evt_441089f373477af3",
+      "timestamp": "2026-09-06T12:04:41.282Z"
+    },
+    {
+      "userId": "usr_72e1e31c110e999d",
+      "eventType": "SIGNUP",
+      "provider": "GOOGLE",
+      "email": "explorer@nexus.studio",
+      "name": "Nexus Explorer",
+      "isNewUser": true,
+      "requestedPage": "/",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+      "id": "evt_8c4f20b56de8aed8",
+      "timestamp": "2026-09-06T11:57:16.356Z"
+    }
+  ],
+  "projectLeads": [],
+  "sessions": [
+    {
+      "token": "9d60d923b99f0911026adf3a5019dea5a26ae5d59f768296cf579ddb82b52732",
+      "userId": "usr_8842005bd16cf1db",
+      "expiresAt": 1791288281282
+    },
+    {
+      "token": "3436963b6d849ff74327a43de9507aee66fac455340694440711d09083e516ad",
+      "userId": "usr_72e1e31c110e999d",
+      "expiresAt": 1791304815918
+    },
+    {
+      "token": "3f7950de85d9acd93ee48307f80b8a65c0aecdd7498bec47128856a387c91bdc",
+      "userId": "usr_33e34e102dd55603",
+      "expiresAt": 1791304820546
+    },
+    {
+      "token": "40ee1e908e27d47135eda36feb7cf4c0a369c343a8eda8d9179486de26cdd1c4",
+      "userId": "usr_admin_nexus",
+      "expiresAt": 1791305011893
+    },
+    {
+      "token": "71a0aa4df23538f630b0e60625caa3cde649289d7ac808cf6e725aeddab09b1b",
+      "userId": "usr_dd6bd4ec589fcfcb",
+      "expiresAt": 1791305021013
+    }
+  ]
+}
