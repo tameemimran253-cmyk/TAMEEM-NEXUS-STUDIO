@@ -24,7 +24,6 @@ export const Logo: React.FC<LogoProps> = ({
 
   return (
     <div className={`inline-flex items-center gap-3 select-none group ${className}`}>
-      {/* Geometric TNS Nexus Symbol */}
       <div
         className="relative shrink-0 transition-transform duration-300 group-hover:scale-105"
         style={{ width: currentSize.icon, height: currentSize.icon }}
@@ -55,7 +54,7 @@ export const Logo: React.FC<LogoProps> = ({
             </filter>
           </defs>
 
-          {/* Hexagonal Outer Nexus Frame */}
+          {/* Outer Cyber Hexagon with Vertex Nodes */}
           <polygon
             points="50,4 92,27 92,73 50,96 8,73 8,27"
             stroke="url(#tns-grad-1)"
@@ -65,57 +64,43 @@ export const Logo: React.FC<LogoProps> = ({
             className="opacity-40 group-hover:opacity-80 transition-opacity duration-300"
           />
 
-          {/* Geometric 'T' Top Bar & Pillar (Interlocking Nexus) */}
+          {/* Futuristic Interlocking "T" and "N" Geometric Monogram */}
+          {/* Stem & Top of T */}
           <path
             d="M 24 28 L 76 28 L 76 36 L 54 36 L 54 74 L 46 74 L 46 36 L 24 36 Z"
             fill="url(#tns-grad-1)"
             className="transition-all duration-300"
           />
-
-          {/* Geometric 'N' Slanted Bridge / Left Leg */}
+          {/* N Left Pillar */}
           <path
             d="M 24 38 L 32 38 L 32 72 L 24 72 Z"
             fill="url(#tns-grad-2)"
             className="opacity-90"
           />
+          {/* N Diagonal Left Cut */}
           <path
             d="M 28 42 L 50 68 L 50 74 L 42 74 L 28 54 Z"
             fill="url(#tns-grad-2)"
             className="opacity-75"
           />
-
-          {/* Geometric 'S' Lower Flow / Right Leg */}
+          {/* N Right Pillar */}
           <path
             d="M 68 38 L 76 38 L 76 72 L 68 72 Z"
             fill="url(#tns-grad-2)"
             className="opacity-90"
           />
+          {/* N Diagonal Right Cut */}
           <path
             d="M 50 48 L 72 72 L 64 72 L 46 52 Z"
             fill="url(#tns-grad-accent)"
             className="opacity-80"
           />
 
-          {/* Central Nexus Core Node */}
-          <circle
-            cx="50"
-            cy="50"
-            r="4.5"
-            fill="#ffffff"
-            filter="url(#nexus-glow)"
-            className="animate-pulse"
-          />
-          <circle
-            cx="50"
-            cy="50"
-            r="8"
-            stroke="#a855f7"
-            strokeWidth="1.5"
-            strokeDasharray="2 3"
-            className="opacity-80"
-          />
+          {/* Center Nexus Core Pulsing Node */}
+          <circle cx="50" cy="50" r="4.5" fill="#ffffff" filter="url(#nexus-glow)" className="animate-pulse" />
+          <circle cx="50" cy="50" r="8" stroke="#a855f7" strokeWidth="1.5" strokeDasharray="2 3" className="opacity-80" />
 
-          {/* Dynamic Corner Node Pins */}
+          {/* Hexagonal Vertex Data Dots */}
           <circle cx="50" cy="4" r="2" fill="#38bdf8" />
           <circle cx="92" cy="27" r="2" fill="#a855f7" />
           <circle cx="92" cy="73" r="2" fill="#c084fc" />
@@ -125,13 +110,16 @@ export const Logo: React.FC<LogoProps> = ({
         </svg>
       </div>
 
-      {/* Typography */}
       {showText && variant !== 'symbol' && (
         <div className="flex flex-col text-left leading-none">
-          <div className={`font-syne font-extrabold tracking-[0.22em] text-white group-hover:text-purple-200 transition-colors ${currentSize.text}`}>
+          <div
+            className={`font-syne font-extrabold tracking-[0.22em] text-white group-hover:text-purple-200 transition-colors ${currentSize.text}`}
+          >
             TAMEEM NEXUS
           </div>
-          <div className={`font-mono-code tracking-[0.35em] text-neutral-400 group-hover:text-purple-300 uppercase transition-colors mt-1 ${currentSize.sub}`}>
+          <div
+            className={`font-mono-code tracking-[0.35em] text-neutral-400 group-hover:text-purple-300 uppercase transition-colors mt-1 ${currentSize.sub}`}
+          >
             STUDIO
           </div>
         </div>
