@@ -898,11 +898,13 @@ async function startServer() {
     try {
       const rawProvider = String(req.body?.provider || "google").toLowerCase();
       const provider = rawProvider.includes("facebook") ? "facebook" : "google";
-      const defaultEmail = provider === "google" ? "tameemimran253@gmail.com" : "tameem.imran@facebook.com";
-      const rawEmail = req.body?.email || defaultEmail;
-      const email = sanitizeEmail(rawEmail, defaultEmail);
-      const name = String(req.body?.name || email.split("@")[0] || "Tameem Imran").trim();
-      const profilePhotoUrl = req.body?.profilePhotoUrl || (provider === "google" ? "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80" : "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80");
+      const rawEmail = req.body?.email?.trim();
+      if (!rawEmail) {
+        return res.status(400).json({ success: false, error: "Please enter your email or social account identifier." });
+      }
+      const email = sanitizeEmail(rawEmail);
+      const name = String(req.body?.name || email.split("@")[0] || "Studio Member").trim();
+      const profilePhotoUrl = req.body?.profilePhotoUrl || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}&backgroundColor=7c3aed,4f46e5`;
       const requestedPage = req.body?.requestedPage || "/";
       const userAgent = req.body?.userAgent || (typeof req.headers["user-agent"] === "string" ? req.headers["user-agent"] : "Browser Client");
       let user = db.findUserByEmail(email);
@@ -945,12 +947,13 @@ async function startServer() {
       console.error("[Auth API] OAuth error recovery:", err);
       const rawProvider = String(req.body?.provider || "google").toLowerCase();
       const provider = rawProvider.includes("facebook") ? "facebook" : "google";
+      const userEmail = req.body?.email?.trim().toLowerCase() || "user@example.com";
       const fallbackUser = {
         id: `usr_oauth_${Date.now()}`,
-        name: req.body?.name || "Tameem Imran",
-        email: req.body?.email || (provider === "facebook" ? "tameem.member@facebook.com" : "tameemimran253@gmail.com"),
+        name: req.body?.name || userEmail.split("@")[0] || "Studio Member",
+        email: userEmail,
         authProvider: provider,
-        role: "user",
+        role: userEmail === "tameemimran253@gmail.com" ? "admin" : "user",
         createdAt: (/* @__PURE__ */ new Date()).toISOString(),
         lastLoginAt: (/* @__PURE__ */ new Date()).toISOString()
       };

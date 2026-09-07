@@ -19,7 +19,13 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   token: string | null;
-  login: (email: string, pass: string, requestedPage?: string) => Promise<{ success: boolean; error?: string }>;
+  login: (
+    email: string,
+    pass: string,
+    requestedPage?: string,
+    provider?: 'google' | 'facebook',
+    name?: string
+  ) => Promise<{ success: boolean; error?: string }>;
   signup: (name: string, email: string, pass: string, requestedPage?: string) => Promise<{ success: boolean; error?: string }>;
   loginWithOAuth: (
     provider: 'google' | 'facebook',
@@ -51,12 +57,22 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [user, setUser] = useState<UserProfile | null>(() => {
     try {
       const stored = localStorage.getItem(USER_KEY);
-      return stored ? JSON.parse(stored) : null;
+      if (!stored) return null;
+      const parsed = JSON.parse(stored);
+      if (parsed?.authProvider === 'guest') {
+        localStorage.removeItem(USER_KEY);
+        localStorage.removeItem(TOKEN_KEY);
+        return null;
+      }
+      return parsed;
     } catch {
       return null;
     }
   });
-  const [token, setToken] = useState<string | null>(() => localStorage.getItem(TOKEN_KEY));
+  const [token, setToken] = useState<string | null>(() => {
+    const stored = localStorage.getItem(TOKEN_KEY);
+    return stored === 'guest_token' ? null : stored;
+  });
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   // Global UI Modals
@@ -74,29 +90,37 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       if (storedUserRaw) {
         try {
           localUser = JSON.parse(storedUserRaw);
+          if (localUser?.authProvider === 'guest') {
+            localStorage.removeItem(USER_KEY);
+            localStorage.removeItem(TOKEN_KEY);
+            setUser(null);
+            setToken(null);
+            setIsLoading(false);
+            return;
+          }
           if (localUser) setUser(localUser);
         } catch {}
       }
 
-      if (!storedToken) {
+      if (!storedToken || storedToken === 'guest_token') {
+        localStorage.removeItem(USER_KEY);
+        localStorage.removeItem(TOKEN_KEY);
+        setUser(null);
+        setToken(null);
         setIsLoading(false);
         return;
       }
 
-      // Check if stored token is local guest/static session
-      if (storedToken === 'guest_token' || storedToken.startsWith('oauth_token_') || storedToken.startsWith('token_')) {
-        if (!localUser) {
-          const fallbackUser: UserProfile = {
-            id: 'user_nexus',
-            name: 'Studio Visitor',
-            email: 'visitor@tameemnexus.com',
-            authProvider: storedToken === 'guest_token' ? 'guest' : 'email',
-            role: 'user',
-            createdAt: new Date().toISOString(),
-            lastLoginAt: new Date().toISOString(),
-          };
-          setUser(fallbackUser);
-          localStorage.setItem(USER_KEY, JSON.stringify(fallbackUser));
+      // Check if stored token is local verified session
+      if (storedToken.startsWith('oauth_token_') || storedToken.startsWith('token_')) {
+        if (localUser && localUser.authProvider !== 'guest') {
+          setUser(localUser);
+          setToken(storedToken);
+        } else {
+          localStorage.removeItem(USER_KEY);
+          localStorage.removeItem(TOKEN_KEY);
+          setUser(null);
+          setToken(null);
         }
         setIsLoading(false);
         return;
@@ -140,12 +164,24 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     verifySession();
   }, []);
 
-  const login = async (email: string, pass: string, requestedPage = '/') => {
+  const login = async (
+    email: string,
+    pass: string,
+    requestedPage = '/',
+    provider?: 'google' | 'facebook',
+    name?: string
+  ) => {
     try {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password: pass, requestedPage }),
+        body: JSON.stringify({
+          email,
+          password: pass,
+          requestedPage,
+          provider,
+          name,
+        }),
       });
 
       const contentType = res.headers.get('content-type');
@@ -163,24 +199,28 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       }
       // Non-JSON response (e.g. Netlify static SPA fallback)
       throw new Error('Static host mode');
-    } catch {
-      // Offline / Static deployment graceful login
-      const localUser: UserProfile = {
-        id: `user_${Date.now()}`,
-        name: email.split('@')[0],
-        email: email.toLowerCase(),
-        authProvider: 'email',
-        role: email.toLowerCase().includes('admin') || email.toLowerCase() === 'tameemimran253@gmail.com' ? 'admin' : 'user',
-        createdAt: new Date().toISOString(),
-        lastLoginAt: new Date().toISOString(),
-      };
-      const dummyToken = `token_${Date.now()}`;
-      localStorage.setItem(TOKEN_KEY, dummyToken);
-      localStorage.setItem(USER_KEY, JSON.stringify(localUser));
-      setToken(dummyToken);
-      setUser(localUser);
-      setAuthModalOpen(false);
-      return { success: true };
+    } catch (err: any) {
+      if (err?.message === 'Static host mode') {
+        const detectedProvider = provider || (email.includes('@facebook') ? 'facebook' : 'google');
+        const cleanName = name || email.split('@')[0] || 'Studio Member';
+        const localUser: UserProfile = {
+          id: `user_${Date.now()}`,
+          name: cleanName,
+          email: email.toLowerCase(),
+          authProvider: detectedProvider,
+          role: email.toLowerCase() === 'tameemimran253@gmail.com' ? 'admin' : 'user',
+          createdAt: new Date().toISOString(),
+          lastLoginAt: new Date().toISOString(),
+        };
+        const dummyToken = `token_${Date.now()}`;
+        localStorage.setItem(TOKEN_KEY, dummyToken);
+        localStorage.setItem(USER_KEY, JSON.stringify(localUser));
+        setToken(dummyToken);
+        setUser(localUser);
+        setAuthModalOpen(false);
+        return { success: true };
+      }
+      return { success: false, error: 'Could not connect to authentication services.' };
     }
   };
 
@@ -232,15 +272,23 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     requestedPage = '/',
     customDetails?: { name?: string; email?: string; photo?: string }
   ) => {
-    const isGoogle = provider === 'google';
-    const defaultEmail = isGoogle ? 'tameemimran253@gmail.com' : 'tameem.imran@facebook.com';
-    const targetEmail = (customDetails?.email || defaultEmail).toLowerCase().trim();
-    const targetName = (customDetails?.name || 'Tameem Imran').trim();
-    const targetPhoto = customDetails?.photo || (isGoogle
-      ? 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80'
-      : 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80');
+    const rawEmail = customDetails?.email?.trim();
+    if (!rawEmail) {
+      return { success: false, error: 'Please enter your personal email or Facebook account identifier.' };
+    }
 
-    const isAdmin = targetEmail === 'tameemimran253@gmail.com' || targetEmail.includes('admin');
+    let targetEmail = rawEmail.toLowerCase();
+    if (provider === 'facebook' && !targetEmail.includes('@')) {
+      const cleanId = targetEmail.replace(/https?:\/\/(www\.)?facebook\.com\//, '').replace(/[^a-z0-9._-]/g, '');
+      targetEmail = `${cleanId || 'member'}@facebook.user`;
+    }
+
+    const targetName = (customDetails?.name || rawEmail.split('@')[0] || 'Studio Member').trim();
+    const targetPhoto = customDetails?.photo || (provider === 'google'
+      ? `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(targetName)}&backgroundColor=7c3aed,4f46e5`
+      : `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(targetName)}&backgroundColor=1877f2,2563eb`);
+
+    const isAdmin = targetEmail === 'tameemimran253@gmail.com';
 
     const reliableUser: UserProfile = {
       id: `oauth_${provider}_${Date.now().toString(36)}`,

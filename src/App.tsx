@@ -37,7 +37,6 @@ import { DemoModal } from './components/DemoModal';
 import { PricingModal } from './components/PricingModal';
 import { NotifyMeModal } from './components/NotifyMeModal';
 import { ReviewsSection } from './components/ReviewsSection';
-import { AuthScreen } from './components/AuthScreen';
 import { ProfileModal } from './components/ProfileModal';
 import { AdminDashboardModal } from './components/AdminDashboardModal';
 import { NexusAIAssistant } from './components/NexusAIAssistant';
@@ -46,7 +45,7 @@ import { CreativePointOfViewVisual } from './components/CreativePointOfViewVisua
 import { SpatialCraftVisual } from './components/SpatialCraftVisual';
 import { OrganicNatureFrame } from './components/OrganicNatureFrame';
 import { Logo } from './components/Logo';
-import { AuthProvider, useAuth } from './context/AuthContext';
+import { AuthProvider } from './context/AuthContext';
 
 import {
   studioInfo,
@@ -87,7 +86,6 @@ const getServiceIcon = (id: string) => {
 };
 
 function MainStudioExperience() {
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
   const [introLoading, setIntroLoading] = useState(true);
   const [isContactOpen, setIsContactOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState<ProjectItem | null>(null);
@@ -101,7 +99,7 @@ function MainStudioExperience() {
 
   // GSAP ScrollTrigger Animations (Hardware-accelerated transforms, zero blur lag)
   useEffect(() => {
-    if (introLoading || !isAuthenticated) return;
+    if (introLoading) return;
 
     const ctx = gsap.context(() => {
       const revealElements = document.querySelectorAll('.gsap-reveal');
@@ -127,7 +125,7 @@ function MainStudioExperience() {
     return () => {
       ctx.revert();
     };
-  }, [introLoading, isAuthenticated]);
+  }, [introLoading]);
 
   const handleOpenContactWithService = (serviceId: string) => {
     setSelectedServiceForContact(serviceId);
@@ -148,17 +146,6 @@ function MainStudioExperience() {
       el.scrollIntoView({ behavior: 'smooth' });
     }
   };
-
-  // If not authenticated, display the cinematic Authentication Gate Screen
-  if (!isAuthenticated && !authLoading) {
-    return (
-      <div className="relative min-h-screen bg-[#030206] text-[#ededed]">
-        <NexusWebGLScene />
-        <OrganicNatureFrame />
-        <AuthScreen onAuthenticated={() => {}} />
-      </div>
-    );
-  }
 
   return (
     <div

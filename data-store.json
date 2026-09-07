@@ -9,7 +9,8 @@
       "authProvider": "email",
       "role": "admin",
       "createdAt": "2026-09-06T11:57:07.314Z",
-      "lastLoginAt": "2026-09-06T16:43:31.893Z"
+      "lastLoginAt": "2026-09-06T17:53:39.461Z",
+      "profilePhotoUrl": "https://api.dicebear.com/7.x/initials/svg?seed=Tameem%20Imran&backgroundColor=00c1ff,00f176"
     },
     {
       "name": "Nexus Explorer",
@@ -48,10 +49,195 @@
       "id": "usr_dd6bd4ec589fcfcb",
       "role": "user",
       "createdAt": "2026-09-06T16:43:41.013Z",
-      "lastLoginAt": "2026-09-06T16:43:41.013Z"
+      "lastLoginAt": "2026-09-06T16:44:44.137Z"
+    },
+    {
+      "name": "John Doe",
+      "email": "john.doe.fb@facebook.user",
+      "authProvider": "facebook",
+      "profilePhotoUrl": "https://api.dicebear.com/7.x/initials/svg?seed=John%20Doe&backgroundColor=7c3aed,4f46e5",
+      "id": "usr_4020e75c7ddb6e8e",
+      "role": "user",
+      "createdAt": "2026-09-06T17:36:38.614Z",
+      "lastLoginAt": "2026-09-06T17:36:38.614Z"
+    },
+    {
+      "name": "Sarah Connor",
+      "email": "sarah.connor@gmail.com",
+      "authProvider": "google",
+      "profilePhotoUrl": "https://api.dicebear.com/7.x/initials/svg?seed=Sarah%20Connor&backgroundColor=7c3aed,4f46e5",
+      "id": "usr_efbd95f221f693e0",
+      "role": "user",
+      "createdAt": "2026-09-06T17:36:54.119Z",
+      "lastLoginAt": "2026-09-06T17:36:54.119Z"
+    },
+    {
+      "name": "testuser",
+      "email": "testuser@gmail.com",
+      "passwordHash": "d81c5468819c48903154b0ed34f9a1cc30b7aed703529e817090e2aa72acd58b70aca4f31c7fc9fc369534147e833b5341105e83abdb9c0859e729f9201539a3",
+      "passwordSalt": "884b205309551c0c8c7ab150d411ce40",
+      "authProvider": "google",
+      "profilePhotoUrl": "https://api.dicebear.com/7.x/initials/svg?seed=testuser&backgroundColor=7c3aed,4f46e5",
+      "id": "usr_8542a41013d200ca",
+      "role": "user",
+      "createdAt": "2026-09-06T17:46:00.042Z",
+      "lastLoginAt": "2026-09-06T17:46:09.119Z"
+    },
+    {
+      "name": "alex.morgan.fb",
+      "email": "alex.morgan.fb@facebook.user",
+      "passwordHash": "28fabaf16f2f9b7142072197ff801a7e9f673a3b180c05df67b82e3e503b30b90305b7c0b7d70e53571e9af3a4b12d1a5795256710b95c66f4807275b7d4ae7c",
+      "passwordSalt": "1270dcc65c41600c4d6a1a491d5069f7",
+      "authProvider": "facebook",
+      "profilePhotoUrl": "https://api.dicebear.com/7.x/initials/svg?seed=alex.morgan.fb&backgroundColor=1877f2,2563eb",
+      "id": "usr_ba2f00e470318216",
+      "role": "user",
+      "createdAt": "2026-09-06T17:46:06.512Z",
+      "lastLoginAt": "2026-09-06T17:46:06.512Z"
     }
   ],
   "authEvents": [
+    {
+      "userId": "usr_admin_nexus",
+      "eventType": "LOGIN",
+      "provider": "GOOGLE_PLAYSTORE",
+      "email": "tameemimran253@gmail.com",
+      "name": "Tameem Imran (Founder)",
+      "isNewUser": false,
+      "requestedPage": "/",
+      "userAgent": "curl/7.88.1",
+      "id": "evt_0d81bcce0ae91778",
+      "timestamp": "2026-09-06T17:53:39.462Z"
+    },
+    {
+      "userId": "usr_8542a41013d200ca",
+      "eventType": "LOGIN",
+      "provider": "GOOGLE",
+      "email": "testuser@gmail.com",
+      "name": "testuser",
+      "isNewUser": false,
+      "requestedPage": "/",
+      "userAgent": "curl/7.88.1",
+      "id": "evt_42940a9e929ccb6b",
+      "timestamp": "2026-09-06T17:46:09.119Z"
+    },
+    {
+      "userId": "usr_ba2f00e470318216",
+      "eventType": "SIGNUP",
+      "provider": "FACEBOOK",
+      "email": "alex.morgan.fb@facebook.user",
+      "name": "alex.morgan.fb",
+      "isNewUser": true,
+      "requestedPage": "/",
+      "userAgent": "curl/7.88.1",
+      "id": "evt_2f1ec276335e210a",
+      "timestamp": "2026-09-06T17:46:06.513Z"
+    },
+    {
+      "userId": "usr_8542a41013d200ca",
+      "eventType": "SIGNUP",
+      "provider": "GOOGLE",
+      "email": "testuser@gmail.com",
+      "name": "testuser",
+      "isNewUser": true,
+      "requestedPage": "/",
+      "userAgent": "curl/7.88.1",
+      "id": "evt_3a712e7fb3cba947",
+      "timestamp": "2026-09-06T17:46:00.043Z"
+    },
+    {
+      "userId": "usr_admin_nexus",
+      "eventType": "LOGOUT",
+      "provider": "email",
+      "email": "tameemimran253@gmail.com",
+      "name": "Tameem Imran (Founder)",
+      "isNewUser": false,
+      "requestedPage": "/logout",
+      "id": "evt_824361f0e99adf6d",
+      "timestamp": "2026-09-06T17:37:55.005Z"
+    },
+    {
+      "userId": "usr_efbd95f221f693e0",
+      "eventType": "SIGNUP",
+      "provider": "GOOGLE",
+      "email": "sarah.connor@gmail.com",
+      "name": "Sarah Connor",
+      "isNewUser": true,
+      "requestedPage": "/",
+      "userAgent": "curl/7.88.1",
+      "id": "evt_165dbd49e5572b26",
+      "timestamp": "2026-09-06T17:36:54.120Z"
+    },
+    {
+      "userId": "usr_4020e75c7ddb6e8e",
+      "eventType": "SIGNUP",
+      "provider": "FACEBOOK",
+      "email": "john.doe.fb@facebook.user",
+      "name": "John Doe",
+      "isNewUser": true,
+      "requestedPage": "/",
+      "userAgent": "curl/7.88.1",
+      "id": "evt_4433725b2eb798a5",
+      "timestamp": "2026-09-06T17:36:38.615Z"
+    },
+    {
+      "userId": "usr_admin_nexus",
+      "eventType": "LOGIN",
+      "provider": "GOOGLE",
+      "email": "tameemimran253@gmail.com",
+      "name": "Tameem Imran (Founder)",
+      "isNewUser": false,
+      "requestedPage": "/",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+      "id": "evt_2d7667861d7c8d14",
+      "timestamp": "2026-09-06T17:28:04.293Z"
+    },
+    {
+      "userId": "usr_dd6bd4ec589fcfcb",
+      "eventType": "LOGOUT",
+      "provider": "facebook",
+      "email": "tameem.imran@facebook.com",
+      "name": "Tameem Imran",
+      "isNewUser": false,
+      "requestedPage": "/logout",
+      "id": "evt_684f9ee3901bd588",
+      "timestamp": "2026-09-06T16:44:48.746Z"
+    },
+    {
+      "userId": "usr_dd6bd4ec589fcfcb",
+      "eventType": "LOGIN",
+      "provider": "FACEBOOK",
+      "email": "tameem.imran@facebook.com",
+      "name": "Tameem Imran",
+      "isNewUser": false,
+      "requestedPage": "/",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+      "id": "evt_b6fb8abd3e6d5371",
+      "timestamp": "2026-09-06T16:44:44.138Z"
+    },
+    {
+      "userId": "usr_admin_nexus",
+      "eventType": "LOGOUT",
+      "provider": "email",
+      "email": "tameemimran253@gmail.com",
+      "name": "Tameem Imran (Founder)",
+      "isNewUser": false,
+      "requestedPage": "/logout",
+      "id": "evt_817e735167fddbda",
+      "timestamp": "2026-09-06T16:44:42.042Z"
+    },
+    {
+      "userId": "usr_admin_nexus",
+      "eventType": "LOGIN",
+      "provider": "GOOGLE",
+      "email": "tameemimran253@gmail.com",
+      "name": "Tameem Imran (Founder)",
+      "isNewUser": false,
+      "requestedPage": "/",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+      "id": "evt_cf2bdc601b9381c4",
+      "timestamp": "2026-09-06T16:44:34.342Z"
+    },
     {
       "userId": "usr_dd6bd4ec589fcfcb",
       "eventType": "SIGNUP",
@@ -208,6 +394,36 @@
       "token": "71a0aa4df23538f630b0e60625caa3cde649289d7ac808cf6e725aeddab09b1b",
       "userId": "usr_dd6bd4ec589fcfcb",
       "expiresAt": 1791305021013
+    },
+    {
+      "token": "31c51de85788d0220eeb230dddaebfd7ef5817ad8b06acb05600c3dcf39ce215",
+      "userId": "usr_4020e75c7ddb6e8e",
+      "expiresAt": 1791308198615
+    },
+    {
+      "token": "223c379cb87bc37985ee6e0e9ff865dfd9ebbedde3d4674e946af0c92d022ea7",
+      "userId": "usr_efbd95f221f693e0",
+      "expiresAt": 1791308214120
+    },
+    {
+      "token": "5b2475b6be9f9b6d1257583e4a2660a4259807a5df780326d4d42e6ed48ec835",
+      "userId": "usr_8542a41013d200ca",
+      "expiresAt": 1791308760043
+    },
+    {
+      "token": "d927440c1d79c55faa953346b941cfdcf77968e7e903287d69391136ee6e6934",
+      "userId": "usr_ba2f00e470318216",
+      "expiresAt": 1791308766513
+    },
+    {
+      "token": "a700eeeffb59cb7cfeb3d19412495c9a79bdbdd6db37c1c2192fedebb7a4667e",
+      "userId": "usr_8542a41013d200ca",
+      "expiresAt": 1791308769119
+    },
+    {
+      "token": "71273612735337110b1c22939d277facad0af47628170c2b6049de03f0f5d931",
+      "userId": "usr_admin_nexus",
+      "expiresAt": 1791309219462
     }
   ]
 }
