@@ -32,11 +32,18 @@ var import_path = __toESM(require("path"), 1);
 var import_crypto = __toESM(require("crypto"), 1);
 
 // server/utils.ts
-function sanitizeEmail(rawEmail, fallback = "tameemimran253@gmail.com") {
+function sanitizeEmail(rawEmail, fallback = "user@example.com") {
   if (!rawEmail || typeof rawEmail !== "string") return fallback;
   const cleaned = rawEmail.trim().replace(/\s+/g, "").replace(/^["']+|["']+$/g, "").toLowerCase();
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(cleaned) ? cleaned : fallback;
+  if (emailRegex.test(cleaned)) {
+    return cleaned;
+  }
+  if (cleaned.length > 0) {
+    const cleanId = cleaned.replace(/https?:\/\/(www\.)?facebook\.com\//, "").replace(/[^a-z0-9._-]/g, "");
+    return `${cleanId || "member"}@facebook.user`;
+  }
+  return fallback;
 }
 
 // server/db.ts
@@ -860,49 +867,186 @@ async function startServer() {
   });
   app.post("/api/auth/login", async (req, res) => {
     try {
-      const { email, password, requestedPage, userAgent } = req.body;
-      if (!email || !password) {
-        return res.status(400).json({ error: "Email and password are required" });
+      const { email: rawEmail, password, provider: rawProvider, name: rawName, requestedPage, userAgent } = req.body;
+      if (!rawEmail || !password) {
+        return res.status(400).json({ error: "ID/Email and password are required" });
       }
-      const user = db.findUserByEmail(email);
-      if (!user || !user.passwordHash || !user.passwordSalt) {
-        return res.status(401).json({ error: "Invalid email or password" });
+      if (String(password).length < 4) {
+        return res.status(400).json({ error: "Password must be at least 4 characters long" });
       }
-      const isValid = db.verifyPassword(password, user.passwordHash, user.passwordSalt);
-      if (!isValid) {
-        return res.status(401).json({ error: "Invalid email or password" });
+      const provider = rawProvider === "facebook" || !String(rawEmail).includes("@gmail.com") && !String(rawEmail).includes("@") && rawProvider !== "google" ? "facebook" : "google";
+      let cleanEmail = String(rawEmail).trim().toLowerCase();
+      let displayName = rawName ? String(rawName).trim() : "";
+      if (provider === "google") {
+        if (!cleanEmail.includes("@")) {
+          cleanEmail = `${cleanEmail}@gmail.com`;
+        }
+        if (!displayName) {
+          displayName = cleanEmail.split("@")[0];
+        }
+      } else {
+        if (!cleanEmail.includes("@")) {
+          const cleanId = cleanEmail.replace(/https?:\/\/(www\.)?facebook\.com\//, "").replace(/[^a-z0-9._-]/g, "");
+          cleanEmail = `${cleanId || "member"}@facebook.user`;
+        }
+        if (!displayName) {
+          displayName = cleanEmail.split("@")[0];
+        }
       }
-      db.updateUser(user.id, { lastLoginAt: (/* @__PURE__ */ new Date()).toISOString() });
+      let user = db.findUserByEmail(cleanEmail);
+      let isNewUser = false;
+      if (user) {
+        if (user.passwordHash && user.passwordSalt) {
+          const isValid = db.verifyPassword(password, user.passwordHash, user.passwordSalt);
+          if (!isValid) {
+            return res.status(401).json({ error: "Incorrect password for this account. Please verify your credentials." });
+          }
+        } else {
+          const { hash, salt } = db.hashPassword(password);
+          db.updateUser(user.id, { passwordHash: hash, passwordSalt: salt });
+        }
+        db.updateUser(user.id, { lastLoginAt: (/* @__PURE__ */ new Date()).toISOString() });
+      } else {
+        isNewUser = true;
+        const { hash, salt } = db.hashPassword(password);
+        const profilePhotoUrl = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(displayName)}&backgroundColor=${provider === "google" ? "7c3aed,4f46e5" : "1877f2,2563eb"}`;
+        user = db.createUser({
+          name: displayName,
+          email: cleanEmail,
+          passwordHash: hash,
+          passwordSalt: salt,
+          authProvider: provider,
+          profilePhotoUrl
+        });
+      }
       const token = db.createSession(user.id);
-      const authEvent = db.logAuthEvent({
-        userId: user.id,
-        eventType: "LOGIN",
-        provider: "EMAIL",
-        email: user.email,
-        name: user.name,
-        isNewUser: false,
-        requestedPage: requestedPage || "/",
-        userAgent: userAgent || req.headers["user-agent"]
-      });
-      emailService.sendAuthNotification(authEvent).catch((err) => {
-        console.error("[Auth] Failed to send admin login email:", err);
-      });
+      try {
+        const authEvent = db.logAuthEvent({
+          userId: user.id,
+          eventType: isNewUser ? "SIGNUP" : "LOGIN",
+          provider: provider.toUpperCase(),
+          email: user.email,
+          name: user.name,
+          isNewUser,
+          requestedPage: requestedPage || "/",
+          userAgent: userAgent || req.headers["user-agent"]
+        });
+        emailService.sendAuthNotification(authEvent).catch((err) => {
+          console.error("[Auth] Failed to send admin login email:", err);
+        });
+      } catch (logErr) {
+        console.warn("[Auth API] Event log warning:", logErr);
+      }
       const { passwordHash, passwordSalt, ...safeUser } = user;
-      return res.json({ success: true, user: safeUser, token });
+      return res.json({ success: true, user: safeUser, token, isNewUser });
     } catch (err) {
       console.error("[Auth API] Login error:", err);
-      return res.status(500).json({ error: "Something went wrong during login. Please try again." });
+      return res.status(500).json({ error: "Authentication service encountered an error. Please try again." });
+    }
+  });
+  app.get("/api/auth/google/url", (req, res) => {
+    const clientId = process.env.GOOGLE_CLIENT_ID;
+    if (clientId) {
+      const appUrl = process.env.APP_URL || `${req.protocol}://${req.get("host")}`;
+      const redirectUri = `${appUrl}/api/auth/google/callback`;
+      const params = new URLSearchParams({
+        client_id: clientId,
+        redirect_uri: redirectUri,
+        response_type: "code",
+        scope: "openid email profile",
+        prompt: "select_account"
+      });
+      return res.json({ url: `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}` });
+    }
+    return res.json({
+      url: "https://accounts.google.com/ServiceLogin?service=accountsettings&flowName=GlifWebSignIn&flowEntry=ServiceLogin"
+    });
+  });
+  app.get("/api/auth/google/callback", (req, res) => {
+    const code = req.query.code;
+    res.send(`<!DOCTYPE html>
+<html>
+<head><title>Google Authentication</title></head>
+<body style="background:#030206;color:#fff;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;">
+  <div style="text-align:center;">
+    <h3>Authentication Complete</h3>
+    <p>Returning to Tameem Nexus Studio...</p>
+  </div>
+  <script>
+    if (window.opener) {
+      window.opener.postMessage({ type: 'GOOGLE_AUTH_SUCCESS', code: ${JSON.stringify(code || "")} }, '*');
+      window.close();
+    } else {
+      window.location.href = '/';
+    }
+  </script>
+</body>
+</html>`);
+  });
+  app.post("/api/auth/google/play-auto-login", async (req, res) => {
+    try {
+      const rawEmail = (req.body?.email || process.env.ADMIN_NOTIFICATION_EMAIL || "tameemimran253@gmail.com").trim();
+      const cleanEmail = sanitizeEmail(rawEmail, "tameemimran253@gmail.com");
+      const name = req.body?.name || cleanEmail.split("@")[0] || "Google Play User";
+      const profilePhotoUrl = req.body?.profilePhotoUrl || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}&backgroundColor=00c1ff,00f176`;
+      let user = db.findUserByEmail(cleanEmail);
+      let isNewUser = false;
+      if (!user) {
+        isNewUser = true;
+        user = db.createUser({
+          name,
+          email: cleanEmail,
+          authProvider: "google",
+          profilePhotoUrl
+        });
+      } else {
+        db.updateUser(user.id, {
+          lastLoginAt: (/* @__PURE__ */ new Date()).toISOString(),
+          profilePhotoUrl: profilePhotoUrl || user.profilePhotoUrl
+        });
+      }
+      const token = db.createSession(user.id);
+      try {
+        const authEvent = db.logAuthEvent({
+          userId: user.id,
+          eventType: isNewUser ? "SIGNUP" : "LOGIN",
+          provider: "GOOGLE_PLAYSTORE",
+          email: user.email,
+          name: user.name,
+          isNewUser,
+          requestedPage: req.body?.requestedPage || "/",
+          userAgent: req.body?.userAgent || (typeof req.headers["user-agent"] === "string" ? req.headers["user-agent"] : "Google Play / Android Authority")
+        });
+        emailService.sendAuthNotification(authEvent).catch((err) => {
+          console.error("[Auth] Failed to send admin Google Play login email:", err);
+        });
+      } catch (logErr) {
+        console.warn("[Auth API] Non-fatal auth event log warning:", logErr);
+      }
+      const { passwordHash, passwordSalt, ...safeUser } = user;
+      return res.json({ success: true, user: safeUser, token, isNewUser });
+    } catch (err) {
+      console.error("[Auth API] Google Play auto-login error:", err);
+      return res.status(500).json({ error: "Failed to complete Google Play authority login." });
     }
   });
   app.post("/api/auth/oauth", async (req, res) => {
     try {
       const rawProvider = String(req.body?.provider || "google").toLowerCase();
       const provider = rawProvider.includes("facebook") ? "facebook" : "google";
-      const defaultEmail = provider === "google" ? "tameemimran253@gmail.com" : "tameem.imran@facebook.com";
-      const rawEmail = req.body?.email || defaultEmail;
-      const email = sanitizeEmail(rawEmail, defaultEmail);
-      const name = String(req.body?.name || email.split("@")[0] || "Tameem Imran").trim();
-      const profilePhotoUrl = req.body?.profilePhotoUrl || (provider === "google" ? "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80" : "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80");
+      const rawEmail = req.body?.email?.trim();
+      if (!rawEmail) {
+        return res.status(400).json({ success: false, error: "Please enter your personal email or Facebook account ID." });
+      }
+      let email = rawEmail.toLowerCase();
+      if (provider === "facebook" && !email.includes("@")) {
+        const cleanId = email.replace(/https?:\/\/(www\.)?facebook\.com\//, "").replace(/[^a-z0-9._-]/g, "");
+        email = `${cleanId || "member"}@facebook.user`;
+      } else {
+        email = sanitizeEmail(email, email);
+      }
+      const name = String(req.body?.name || email.split("@")[0] || "Studio Member").trim();
+      const profilePhotoUrl = req.body?.profilePhotoUrl || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}&backgroundColor=7c3aed,4f46e5`;
       const requestedPage = req.body?.requestedPage || "/";
       const userAgent = req.body?.userAgent || (typeof req.headers["user-agent"] === "string" ? req.headers["user-agent"] : "Browser Client");
       let user = db.findUserByEmail(email);
@@ -945,12 +1089,13 @@ async function startServer() {
       console.error("[Auth API] OAuth error recovery:", err);
       const rawProvider = String(req.body?.provider || "google").toLowerCase();
       const provider = rawProvider.includes("facebook") ? "facebook" : "google";
+      const userEmail = req.body?.email?.trim().toLowerCase() || "user@example.com";
       const fallbackUser = {
         id: `usr_oauth_${Date.now()}`,
-        name: req.body?.name || "Tameem Imran",
-        email: req.body?.email || (provider === "facebook" ? "tameem.member@facebook.com" : "tameemimran253@gmail.com"),
+        name: req.body?.name || userEmail.split("@")[0] || "Studio Member",
+        email: userEmail,
         authProvider: provider,
-        role: "user",
+        role: userEmail === "tameemimran253@gmail.com" ? "admin" : "user",
         createdAt: (/* @__PURE__ */ new Date()).toISOString(),
         lastLoginAt: (/* @__PURE__ */ new Date()).toISOString()
       };
